@@ -4,8 +4,7 @@
 1. [Introduction](#introduction)
 2. [Tools Used and Dashboard Preview](#tools-used-and-dashboard-preview)
 3. [Data Cleaning and Preparation](#data-cleaning-and-preparation)
-4. [Results and Next-Steps](#results-and-next-steps)
-5. [Limitations](#limitations)
+4. [Results](#results)
 
 ## Introduction
 The Tetanus Vaccination Dashboard for the hospital provides a comprehensive overview of patient vaccination status, helping healthcare providers efficiently manage and track tetanus immunization efforts. This dashboard is designed to identify patients who have received specific tetanus vaccine codes, monitor the recency of their vaccinations, and highlight those due for a booster shot. Additionally, it enables the hospital staff to focus on active patients who are currently engaged with the hospital's services, ensuring timely and effective vaccine administration. With this tool, the hospital can enhance patient safety and promote proactive health management.
@@ -134,8 +133,5 @@ WHERE pat.id IN (SELECT patient FROM active_patients)
 ```
 
 
-## Results and Next-Steps
-### Results 
-### Next-Steps
-
-## Limitations
+## Results
+The Massachusetts Hospital Tetanus Shot Dashboard allows users to visualize key trends in patient eligibility for tetanus shots across various regions, age groups, and races. It enables users to filter the data by county, age, years since the last shot, and race to focus on specific populations. The map visualization provides insights into eligible patient distributions by county and city, while the profile table gives detailed patient information such as name, age, and years since the last shot. Additionally, the bar chart highlights how eligibility varies by age group and race, offering a comprehensive overview that helps healthcare providers prioritize vaccination efforts based on demographic and geographic insights.
