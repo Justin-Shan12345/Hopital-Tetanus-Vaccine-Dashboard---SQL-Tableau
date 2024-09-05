@@ -26,12 +26,17 @@ https://datawizardry.academy/
 
 
 ## Tools Used and Dashboard Preview
+- **PostgreSQL**: Used for all data cleaning, transformation and analysis.
+- **Tableau**: Dashboard creation and data visualization.
+- Below are screenshots taken from the Medicare Dashboard, which is created using Tableau:
 ![Dashboard 1 (1)](https://github.com/user-attachments/assets/27ef9c71-fd88-43dc-a8ba-6f3cd9069ca1)
+
 ## Data Cleaning and Preparation
 1. **Remove Duplicates**: Identifies and removes duplicate records based on a unique combination of columns.
 2. **Handle Missing Values**: Detects missing values in crucial fields and considers possible actions.
 3. **Validate Data**: Checks for data consistency and correctness (e.g., negative values in numeric fields and ensures the right ID length).
-4. **Standardizing Data Formats**: Check for data consistency and apply the right format to the different fields. 
+4. **Standardizing Data Formats**: Check for data consistency and apply the right format to the different fields.
+
 ### Code Snippets
 ```sql
 WITH patient_history AS (
