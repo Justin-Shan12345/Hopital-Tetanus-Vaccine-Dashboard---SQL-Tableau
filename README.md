@@ -4,9 +4,8 @@
 1. [Introduction](#introduction)
 2. [Tools Used and Dashboard Preview](#tools-used-and-dashboard-preview)
 3. [Data Cleaning and Preparation](#data-cleaning-and-preparation)
-4. [Exploratory Data Analysis (EDA)](#exploratory-data-analysis-eda)
-5. [Results and Next-Steps](#results-and-next-steps)
-6. [Limitations](#limitations)
+4. [Results and Next-Steps](#results-and-next-steps)
+5. [Limitations](#limitations)
 
 ## Introduction
 The Tetanus Vaccination Dashboard for the hospital provides a comprehensive overview of patient vaccination status, helping healthcare providers efficiently manage and track tetanus immunization efforts. This dashboard is designed to identify patients who have received specific tetanus vaccine codes, monitor the recency of their vaccinations, and highlight those due for a booster shot. Additionally, it enables the hospital staff to focus on active patients who are currently engaged with the hospital's services, ensuring timely and effective vaccine administration. With this tool, the hospital can enhance patient safety and promote proactive health management.
@@ -28,7 +27,7 @@ https://datawizardry.academy/
 ## Tools Used and Dashboard Preview
 - **PostgreSQL**: Used for all data cleaning, transformation and analysis.
 - **Tableau**: Dashboard creation and data visualization.
-- Below are screenshots taken from the Medicare Dashboard, which is created using Tableau:
+- Below are screenshots taken from the Tetanus Vaccine Dashboard, which is created using Tableau:
 ![Dashboard 1 (1)](https://github.com/user-attachments/assets/27ef9c71-fd88-43dc-a8ba-6f3cd9069ca1)
 
 ## Data Cleaning and Preparation
@@ -39,6 +38,64 @@ https://datawizardry.academy/
 
 ### Code Snippets
 ```sql
+/* For simplicity, only the code that is used to clean the encounters table is shown,
+the same methodology is applied to the immunizations and patients table. */
+
+-- 1. Remove duplicates based on the defined unique fields
+
+WITH ranked_encounters AS (
+    SELECT 
+        id,
+        ROW_NUMBER() OVER (
+            PARTITION BY start, stop, patient, organization, payer 
+            ORDER BY id
+        ) AS row_num
+    FROM public.encounters
+)
+DELETE FROM public.encounters
+WHERE id IN (
+    SELECT id
+    FROM ranked_encounters
+    WHERE row_num > 1
+);
+
+-- 2. Check for missing values
+
+SELECT *
+FROM public.encounters
+WHERE id IS NULL 
+    OR start IS NULL
+    OR stop IS NULL
+    OR patient IS NULL
+    OR organization IS NULL
+    OR provider IS NULL
+    OR payer IS NULL
+    OR encounterclass IS NULL
+    OR base_encounter_cost IS NULL
+    OR total_claim_cost IS NULL
+    OR payer_coverage IS NULL
+    OR reasoncode IS NULL;
+
+-- 3. Validate data to ensure data fits within constraints
+
+SELECT *
+FROM public.encounters
+WHERE total_claim_cost < 0 
+    OR base_encounter_cost < 0
+    OR payer_coverage < 0;
+
+-- 4. Standardizing data formats
+
+UPDATE public.encounters
+SET start = start::timestamp,
+    stop = stop::timestamp;
+
+/* Finally, this is the final query that filters based on the dashboard requirements
+- List of patients who have received codes 5303 or 5324.
+- Most recent date of the shot, or null if there is no history.
+- A calculated field indicating the number of years since the last tetanus shot.
+- Only include patients who are still active with the hospital, defined as having had an encounter within the last two years.*/
+
 WITH patient_history AS (
     SELECT patient, MAX(date) AS latest_tetanus_date
     FROM public.immunizations
@@ -75,13 +132,7 @@ WHERE pat.id IN (SELECT patient FROM active_patients)
 	AND ((ph.latest_tetanus_date IS NULL) OR (EXTRACT(YEAR FROM age('2022-12-31', ph.latest_tetanus_date)) >=0 ));
 
 ```
-## Exploratory Data Analysis (EDA)
-Exploratory Data Analysis aims to summarize the main characteristics of the dataset using statistical graphics and other data visualization methods:
 
-1. **Provider Type Analysis**: Understand the distribution of various provider types in the Medicare data.
-2. **Service Type Analysis**: the number of services rendered and the corresponding costs incurred on the Medicare program. 
-3. **Ranking Analysis**: Rank healthcare providers based on the total amount claimed.
-### Code Snippets
 
 ## Results and Next-Steps
 ### Results 
